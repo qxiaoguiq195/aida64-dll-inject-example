@@ -5,28 +5,40 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-x64:
     runs-on: windows-latest
-    strategy:
-      matrix:
-        arch: [x64, x86]
-    env:
-      VCVARS: ${{ matrix.arch == 'x64' && 'vcvars64.bat' || 'vcvars32.bat' }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Compile
+      - name: Compile x64
         shell: cmd
         run: |
-          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\%VCVARS%"
-          cl /c /O2 /MT disasmlen.c
-          cl /c /O2 /MT /Yc"pch.h" /Fp"pch.pch" pch.cpp
-          cl /c /O2 /MT /Yu"pch.h" /Fp"pch.pch" dllmain.cpp keygen.cpp direct_hook.cpp
-          link /DLL /OUT:aida64-hook-%ARCH%.dll dllmain.obj keygen.obj direct_hook.obj disasmlen.obj pch.obj version.lib advapi32.lib
-        env:
-          ARCH: ${{ matrix.arch }}
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          cl /c /O2 /MT /std:c++20 disasmlen.c
+          cl /c /O2 /MT /std:c++20 /Yc"pch.h" /Fppch.pch pch.cpp
+          cl /c /O2 /MT /std:c++20 /Yu"pch.h" /Fppch.pch dllmain.cpp keygen.cpp direct_hook.cpp
+          link /DLL /OUT:aida64-hook-x64.dll dllmain.obj keygen.obj direct_hook.obj disasmlen.obj pch.obj version.lib advapi32.lib
 
       - uses: actions/upload-artifact@v4
         with:
-          name: aida64-hook-${{ matrix.arch }}
-          path: aida64-hook-${{ matrix.arch }}.dll
+          name: aida64-hook-x64
+          path: aida64-hook-x64.dll
+
+  build-x86:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compile x86
+        shell: cmd
+        run: |
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars32.bat"
+          cl /c /O2 /MT /std:c++20 disasmlen.c
+          cl /c /O2 /MT /std:c++20 /Yc"pch.h" /Fppch.pch pch.cpp
+          cl /c /O2 /MT /std:c++20 /Yu"pch.h" /Fppch.pch dllmain.cpp keygen.cpp direct_hook.cpp
+          link /DLL /OUT:aida64-hook-x86.dll dllmain.obj keygen.obj direct_hook.obj disasmlen.obj pch.obj version.lib advapi32.lib
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: aida64-hook-x86
+          path: aida64-hook-x86.dll
