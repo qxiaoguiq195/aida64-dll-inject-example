@@ -18,29 +18,9 @@ jobs:
           cl /c /O2 /MT /std:c++20 disasmlen.c
           cl /c /O2 /MT /std:c++20 /Yc"pch.h" /Fppch.pch pch.cpp
           cl /c /O2 /MT /std:c++20 /Yu"pch.h" /Fppch.pch dllmain.cpp keygen.cpp direct_hook.cpp
-          link /DLL /OUT:aida64-hook-x64.dll dllmain.obj keygen.obj direct_hook.obj disasmlen.obj pch.obj version.lib advapi32.lib
+          link /DLL /OUT:aida64-hook-x64.dll dllmain.obj keygen.obj direct_hook.obj disasmlen.obj pch.obj user32.lib version.lib advapi32.lib
 
       - uses: actions/upload-artifact@v4
         with:
           name: aida64-hook-x64
           path: aida64-hook-x64.dll
-
-  build-x86:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Compile x86
-        shell: cmd
-        run: |
-          for /f "tokens=*" %%i in ('vswhere -latest -property installationPath') do set VS_PATH=%%i
-          call "%VS_PATH%\VC\Auxiliary\Build\vcvars32.bat"
-          cl /c /O2 /MT /std:c++20 disasmlen.c
-          cl /c /O2 /MT /std:c++20 /Yc"pch.h" /Fppch.pch pch.cpp
-          cl /c /O2 /MT /std:c++20 /Yu"pch.h" /Fppch.pch dllmain.cpp keygen.cpp direct_hook.cpp
-          link /DLL /OUT:aida64-hook-x86.dll dllmain.obj keygen.obj direct_hook.obj disasmlen.obj pch.obj version.lib advapi32.lib
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: aida64-hook-x86
-          path: aida64-hook-x86.dll
