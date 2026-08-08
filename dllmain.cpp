@@ -10,7 +10,7 @@ namespace {
 		if (!len) return nullptr;
 		for (const char* p = ps; p < pse; ++p) {
 			if (p + len > pse) break;
-			if (strnicmp(p, pt, len) == 0) return p;
+			if (_strnicmp(p, pt, len) == 0) return p;
 		}
 		return nullptr;
 	}
